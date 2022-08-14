@@ -8,31 +8,31 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type Repo[T Document] struct {
+type Collection[T Document] struct {
 	collection *mongo.Collection
 }
 
-func (repo *Repo[T]) Insert(model T) error {
+func (repo *Collection[T]) Insert(model T) error {
 	_, err := repo.collection.InsertOne(DefaultContext(), model)
 	return err
 }
 
-func (repo *Repo[T]) UpdateById(id string, doc bson.M) error {
+func (repo *Collection[T]) UpdateById(id string, doc bson.M) error {
 	_, err := repo.collection.UpdateOne(DefaultContext(), bson.M{"_id": id}, doc)
 	return err
 }
 
-func (repo *Repo[T]) UpdateOne(filter interface{}, doc bson.M) error {
+func (repo *Collection[T]) UpdateOne(filter interface{}, doc bson.M) error {
 	_, err := repo.collection.UpdateOne(DefaultContext(), filter, doc)
 	return err
 }
 
-func (repo *Repo[T]) UpdateMany(filter interface{}, doc bson.M) error {
+func (repo *Collection[T]) UpdateMany(filter interface{}, doc bson.M) error {
 	_, err := repo.collection.UpdateMany(DefaultContext(), filter, doc)
 	return err
 }
 
-func (repo *Repo[T]) FindById(id string) (*T, error) {
+func (repo *Collection[T]) FindById(id string) (*T, error) {
 	var target T
 	err := repo.collection.FindOne(DefaultContext(), bson.M{"_id": id}).Decode(&target)
 
@@ -43,7 +43,7 @@ func (repo *Repo[T]) FindById(id string) (*T, error) {
 	return &target, nil
 }
 
-func (repo *Repo[T]) DeleteById(id string) error {
+func (repo *Collection[T]) DeleteById(id string) error {
 	res, err := repo.collection.DeleteOne(DefaultContext(), bson.M{"_id": id})
 
 	if err != nil {
@@ -57,7 +57,7 @@ func (repo *Repo[T]) DeleteById(id string) error {
 	return nil
 }
 
-func (repo *Repo[T]) FindOne(filter interface{}) (*T, error) {
+func (repo *Collection[T]) FindOne(filter interface{}) (*T, error) {
 	var target T
 	err := repo.collection.FindOne(DefaultContext(), filter).Decode(&target)
 
@@ -68,7 +68,7 @@ func (repo *Repo[T]) FindOne(filter interface{}) (*T, error) {
 	return &target, nil
 }
 
-func (repo *Repo[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T, error) {
+func (repo *Collection[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T, error) {
 	csr, err := repo.collection.Find(DefaultContext(), filter, opts...)
 
 	var result []T
@@ -79,11 +79,11 @@ func (repo *Repo[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T
 	return result, nil
 }
 
-func (repo Repo[T]) CountDocuments(filter interface{}) (int64, error) {
+func (repo Collection[T]) CountDocuments(filter interface{}) (int64, error) {
 	count, err := repo.collection.CountDocuments(DefaultContext(), filter)
 	return count, err
 }
 
-func (repo Repo[T]) NewId() primitive.ObjectID {
+func (repo Collection[T]) NewId() primitive.ObjectID {
 	return primitive.NewObjectID()
 }

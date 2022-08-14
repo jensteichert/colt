@@ -5,7 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func (repo Repo[T]) CreateIndex(keys bson.M) {
+func (repo Collection[T]) CreateIndex(keys bson.M) {
 	go func() {
 		mod := mongo.IndexModel{
 			Keys: keys, Options: nil,

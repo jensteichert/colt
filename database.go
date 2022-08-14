@@ -15,12 +15,11 @@ type Database struct {
 	client *mongo.Client
 }
 
-func (db *Database) ConnectWithDBName(dbName string) {
-	dbURL := "mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false"
+func (db *Database) connect(options *options.ClientOptions, dbName string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbURL))
+	client, err := mongo.Connect(ctx, options)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,12 +29,16 @@ func (db *Database) ConnectWithDBName(dbName string) {
 		log.Print("Connected to MongoDB!")
 	} else {
 		log.Panic("Could not connect to MongoDB! Please check if mongo is running.", err)
+		return err
 	}
 	db.db = db.client.Database(dbName)
+	return nil
 }
 
-func (db *Database) Connect() {
-	db.ConnectWithDBName("colt")
+func (db *Database) Connect(connectionString string, dbName string) error {
+	options := options.Client().ApplyURI(connectionString)
+	err := db.connect(options, dbName)
+	return err
 }
 
 func DefaultContext() context.Context {
@@ -43,6 +46,6 @@ func DefaultContext() context.Context {
 	return ctx
 }
 
-func GetRepo[T Document](db *Database, collectionName string) *Repo[T] {
-	return &Repo[T]{db.db.Collection(collectionName)}
+func GetCollection[T Document](db *Database, collectionName string) *Collection[T] {
+	return &Collection[T]{db.db.Collection(collectionName)}
 }

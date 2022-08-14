@@ -12,15 +12,15 @@ type Todo struct {
 }
 
 type Database struct {
-	Todos *colt.Repo[Todo]
+	Todos *colt.Collection[Todo]
 }
 
 func main() {
 	db := colt.Database{}
-	db.Connect()
+	db.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
 
 	database := Database{
-		Todos: colt.GetRepo[Todo](&db, "todos"),
+		Todos: colt.GetCollection[Todo](&db, "todos"),
 	}
 
 	todo := Todo{
