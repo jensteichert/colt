@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
 )
 
 type Repo[T Document] struct {
@@ -38,7 +37,6 @@ func (repo *Repo[T]) FindById(id string) (*T, error) {
 	err := repo.collection.FindOne(DefaultContext(), bson.M{"_id": id}).Decode(&target)
 
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
@@ -64,7 +62,6 @@ func (repo *Repo[T]) FindOne(filter interface{}) (*T, error) {
 	err := repo.collection.FindOne(DefaultContext(), filter).Decode(&target)
 
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
@@ -76,20 +73,15 @@ func (repo *Repo[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T
 
 	var result []T
 	if err = csr.All(DefaultContext(), &result); err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
 	return result, nil
 }
 
-func (repo Repo[T]) Count(filter interface{}) int64 {
+func (repo Repo[T]) CountDocuments(filter interface{}) (int64, error) {
 	count, err := repo.collection.CountDocuments(DefaultContext(), filter)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return count
+	return count, err
 }
 
 func (repo Repo[T]) NewId() primitive.ObjectID {
