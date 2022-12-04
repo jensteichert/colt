@@ -6,13 +6,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-type Todo struct {
-	Id    string `bson:"_id,omitempty" json:"_id,omitempty"`
-	Title string `bson:"title" json:"title"`
-}
-
 type Database struct {
 	Todos *colt.Collection[Todo]
+}
+type Todo struct {
+	colt.CDocument `bson:",inline"`
+	Title string `bson:"title" json:"title"`
 }
 
 func main() {
@@ -23,14 +22,19 @@ func main() {
 		Todos: colt.GetCollection[Todo](&db, "todos"),
 	}
 
-	todo := Todo{
+	new := Todo{
 		Title: "Hello",
 	}
+	todo, _ := database.Todos.Insert(new)
+	fmt.Println(todo.Title, todo.ID)
 
-	database.Todos.Insert(todo)
+	// Should fails
+	//todo, _ := database.Todos.Insert(newUser)
+
+
 	todos, _ := database.Todos.Find(bson.M{"title": "Hello"})
 
 	for _, todo := range todos {
-		fmt.Print(todo.Title)
+		fmt.Println(todo.ID)
 	}
 }

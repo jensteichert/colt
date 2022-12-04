@@ -12,9 +12,10 @@ type Collection[T Document] struct {
 	collection *mongo.Collection
 }
 
-func (repo *Collection[T]) Insert(model T) error {
-	_, err := repo.collection.InsertOne(DefaultContext(), model)
-	return err
+func (repo *Collection[T]) Insert(model T) (T, error) {
+	res, err := repo.collection.InsertOne(DefaultContext(), model)
+
+	return model.SetID(res.InsertedID).(T), err
 }
 
 func (repo *Collection[T]) UpdateById(id string, doc bson.M) error {
@@ -79,11 +80,11 @@ func (repo *Collection[T]) Find(filter interface{}, opts ...*options.FindOptions
 	return result, nil
 }
 
-func (repo Collection[T]) CountDocuments(filter interface{}) (int64, error) {
+func (repo *Collection[T]) CountDocuments(filter interface{}) (int64, error) {
 	count, err := repo.collection.CountDocuments(DefaultContext(), filter)
 	return count, err
 }
 
-func (repo Collection[T]) NewId() primitive.ObjectID {
+func (repo *Collection[T]) NewId() primitive.ObjectID {
 	return primitive.NewObjectID()
 }
