@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jensteichert/colt"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Database struct {
@@ -21,22 +22,18 @@ func main() {
 		Todos: colt.GetCollection[*Todo](&db, "todos"),
 	}
 
-	new := Todo{
-		Title: "Hello",
-	}
-	todo, _ := database.Todos.Insert(&new)
-	fmt.Println(todo.Title, todo.ID)
+	newTodo := Todo{Title: "Hello"}
 
-	fmt.Println(todo.ID)
+	todo, _ := database.Todos.Insert(&newTodo) // Will return a Todo
 	insertedTodo, _ := database.Todos.FindById(todo.ID)
 
 	if insertedTodo != nil {
-		fmt.Println(insertedTodo.Title)
+		fmt.Println(insertedTodo.ID)
 	}
 
-/*	todos, _ := database.Todos.Find(bson.M{"title": "Hello"})
+	allTodos, _ := database.Todos.Find(bson.M{"title": "Hello"})
 
-	for _, todo := range todos {
-		//fmt.Println(todo.ID)
-	}*/
+	for _, todo := range allTodos {
+		fmt.Println(todo.ID)
+	}
 }
