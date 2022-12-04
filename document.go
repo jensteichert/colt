@@ -1,18 +1,27 @@
 package colt
 
-import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
-)
-
 type Document interface {
-	SetID(id interface{}) Document
+	SetID(id string)
+	GetID() string
+	//CastID(id interface{}) (interface{}, error)
 }
 
 type CDocument struct {
-	ID primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	ID    string `bson:"_id,omitempty" json:"_id,omitempty"`
 }
 
-func (f CDocument) SetID(id interface{}) Document {
-	f.ID = id.(primitive.ObjectID)
-	return f
+func (f *CDocument) SetID(id string) {
+	f.ID = id
 }
+
+func (f *CDocument) GetID() string {
+	return f.ID
+}
+
+/*func (f *CDocument) CastID(id interface{}) (interface{}, error){
+	if string, ok := id.(string); ok {
+		return primitive.ObjectIDFromHex(string)
+	}
+
+	return id, nil
+}*/

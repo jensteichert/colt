@@ -13,9 +13,12 @@ type Collection[T Document] struct {
 }
 
 func (repo *Collection[T]) Insert(model T) (T, error) {
+	if model.GetID() == "" {
+		model.SetID(repo.NewId().Hex())
+	}
 	res, err := repo.collection.InsertOne(DefaultContext(), model)
-
-	return model.SetID(res.InsertedID).(T), err
+	model.SetID(res.InsertedID.(string))
+	return model, err
 }
 
 func (repo *Collection[T]) UpdateById(id string, doc bson.M) error {
@@ -33,15 +36,12 @@ func (repo *Collection[T]) UpdateMany(filter interface{}, doc bson.M) error {
 	return err
 }
 
-func (repo *Collection[T]) FindById(id string) (*T, error) {
+func (repo *Collection[T]) FindById(id interface{}) (T, error) {
 	var target T
-	err := repo.collection.FindOne(DefaultContext(), bson.M{"_id": id}).Decode(&target)
+	//safeID, err := T.CastID(id)
+	err := repo.collection.FindOne(DefaultContext(), bson.M{"_id": id}).Decode(target)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return &target, nil
+	return target, err
 }
 
 func (repo *Collection[T]) DeleteById(id string) error {

@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/jensteichert/colt"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Database struct {
-	Todos *colt.Collection[Todo]
+	Todos *colt.Collection[*Todo]
 }
 type Todo struct {
 	colt.CDocument `bson:",inline"`
@@ -19,22 +18,25 @@ func main() {
 	db.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
 
 	database := Database{
-		Todos: colt.GetCollection[Todo](&db, "todos"),
+		Todos: colt.GetCollection[*Todo](&db, "todos"),
 	}
 
 	new := Todo{
 		Title: "Hello",
 	}
-	todo, _ := database.Todos.Insert(new)
+	todo, _ := database.Todos.Insert(&new)
 	fmt.Println(todo.Title, todo.ID)
 
-	// Should fails
-	//todo, _ := database.Todos.Insert(newUser)
+	fmt.Println(todo.ID)
+	insertedTodo, _ := database.Todos.FindById(todo.ID)
 
+	if insertedTodo != nil {
+		fmt.Println(insertedTodo.Title)
+	}
 
-	todos, _ := database.Todos.Find(bson.M{"title": "Hello"})
+/*	todos, _ := database.Todos.Find(bson.M{"title": "Hello"})
 
 	for _, todo := range todos {
-		fmt.Println(todo.ID)
-	}
+		//fmt.Println(todo.ID)
+	}*/
 }
