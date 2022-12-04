@@ -12,9 +12,13 @@ type Collection[T Document] struct {
 	collection *mongo.Collection
 }
 
-func (repo *Collection[T]) Insert(model T) error {
-	_, err := repo.collection.InsertOne(DefaultContext(), model)
-	return err
+func (repo *Collection[T]) Insert(model T) (T, error) {
+	if model.GetID() == "" {
+		model.SetID(repo.NewId().Hex())
+	}
+	res, err := repo.collection.InsertOne(DefaultContext(), model)
+	model.SetID(res.InsertedID.(string))
+	return model, err
 }
 
 func (repo *Collection[T]) UpdateById(id string, doc bson.M) error {
@@ -32,15 +36,12 @@ func (repo *Collection[T]) UpdateMany(filter interface{}, doc bson.M) error {
 	return err
 }
 
-func (repo *Collection[T]) FindById(id string) (*T, error) {
+func (repo *Collection[T]) FindById(id interface{}) (T, error) {
 	var target T
-	err := repo.collection.FindOne(DefaultContext(), bson.M{"_id": id}).Decode(&target)
+	//safeID, err := T.CastID(id)
+	err := repo.collection.FindOne(DefaultContext(), bson.M{"_id": id}).Decode(target)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return &target, nil
+	return target, err
 }
 
 func (repo *Collection[T]) DeleteById(id string) error {
@@ -79,11 +80,11 @@ func (repo *Collection[T]) Find(filter interface{}, opts ...*options.FindOptions
 	return result, nil
 }
 
-func (repo Collection[T]) CountDocuments(filter interface{}) (int64, error) {
+func (repo *Collection[T]) CountDocuments(filter interface{}) (int64, error) {
 	count, err := repo.collection.CountDocuments(DefaultContext(), filter)
 	return count, err
 }
 
-func (repo Collection[T]) NewId() primitive.ObjectID {
+func (repo *Collection[T]) NewId() primitive.ObjectID {
 	return primitive.NewObjectID()
 }
