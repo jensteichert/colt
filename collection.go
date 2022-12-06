@@ -10,12 +10,16 @@ import (
 
 type Collection[T Document] struct {
 	collection *mongo.Collection
+	hooks []Hook[T]
 }
 
 func (repo *Collection[T]) Insert(model T) (T, error) {
 	if model.GetID() == "" {
 		model.SetID(repo.NewId().Hex())
 	}
+
+	err := repo.execHooks(BeforeInsert, model)
+
 	res, err := repo.collection.InsertOne(DefaultContext(), model)
 	model.SetID(res.InsertedID.(string))
 	return model, err

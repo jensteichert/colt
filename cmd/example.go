@@ -10,8 +10,8 @@ type Database struct {
 	Todos *colt.Collection[*Todo]
 }
 type Todo struct {
-	colt.CDocument `bson:",inline"`
-	Title string `bson:"title" json:"title"`
+	colt.Doc `bson:",inline"`
+	Title    string `bson:"title" json:"title"`
 }
 
 func main() {
@@ -22,13 +22,20 @@ func main() {
 		Todos: colt.GetCollection[*Todo](&db, "todos"),
 	}
 
+	database.Todos.AddHook(colt.BeforeInsert, func (doc *Todo) error {
+		doc.Title = "Hook has been executed"
+		return nil
+	})
+
 	newTodo := Todo{Title: "Hello"}
 
 	todo, _ := database.Todos.Insert(&newTodo) // Will return a Todo
 	insertedTodo, _ := database.Todos.FindById(todo.ID)
 
+	fmt.Println(todo.Title)
+
 	if insertedTodo != nil {
-		fmt.Println(insertedTodo.ID)
+		fmt.Println(insertedTodo.Title)
 	}
 
 	allTodos, _ := database.Todos.Find(bson.M{"title": "Hello"})

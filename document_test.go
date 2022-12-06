@@ -3,7 +3,7 @@ package colt
 import "testing"
 
 type Todo struct {
-	CDocument `bson:",inline"`
+	Doc   `bson:",inline"`
 	Title string `bson:"title" json:"title"`
 }
 func TestCDocument_SetID(t *testing.T) {
