@@ -10,7 +10,6 @@ import (
 
 type Collection[T Document] struct {
 	collection *mongo.Collection
-	hooks []Hook[T]
 }
 
 func (repo *Collection[T]) Insert(model T) (T, error) {
@@ -18,20 +17,29 @@ func (repo *Collection[T]) Insert(model T) (T, error) {
 		model.SetID(repo.NewId().Hex())
 	}
 
-	err := repo.execHooks(BeforeInsert, model)
+	if hook, ok := any(model).(BeforeInsertHook); ok {
+		if err := hook.BeforeInsert(); err != nil {
+			return model, err
+		}
+	}
 
 	res, err := repo.collection.InsertOne(DefaultContext(), model)
 	model.SetID(res.InsertedID.(string))
 	return model, err
 }
 
-func (repo *Collection[T]) UpdateById(id string, doc bson.M) error {
-	_, err := repo.collection.UpdateOne(DefaultContext(), bson.M{"_id": id}, doc)
-	return err
+func (repo *Collection[T]) UpdateById(id string, model T) error {
+	return repo.UpdateOne(bson.M{"_id": id}, model)
 }
 
-func (repo *Collection[T]) UpdateOne(filter interface{}, doc bson.M) error {
-	_, err := repo.collection.UpdateOne(DefaultContext(), filter, doc)
+func (repo *Collection[T]) UpdateOne(filter interface{}, model T) error {
+	if hook, ok := any(model).(BeforeUpdate); ok {
+		if err := hook.BeforeUpdate(); err != nil {
+			return err
+		}
+	}
+
+	_, err := repo.collection.UpdateOne(DefaultContext(), filter, model)
 	return err
 }
 

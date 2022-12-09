@@ -23,7 +23,7 @@ func (doc *Doc) GetID() string {
 type DocWithTimestamps struct {
 	Doc `bson:",inline"`
 	CreatedAt time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 }
 
 func (doc *DocWithTimestamps) BeforeInsert() error {
@@ -32,6 +32,7 @@ func (doc *DocWithTimestamps) BeforeInsert() error {
 }
 
 func (doc *DocWithTimestamps) BeforeUpdate() error {
-	doc.UpdatedAt = time.Now()
+	now := time.Now();
+	doc.UpdatedAt = &now
 	return nil
 }
