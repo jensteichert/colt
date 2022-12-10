@@ -27,8 +27,9 @@ import (
 type Database struct {
 	Todos *colt.Collection[*Todo]
 }
+
 type Todo struct {
-	colt.CDocument `bson:",inline"`
+	colt.DocWithTimestamps `bson:",inline"`
 	Title string `bson:"title" json:"title"`
 }
 
@@ -46,17 +47,14 @@ func main() {
 	insertedTodo, _ := database.Todos.FindById(todo.ID)
 
 	allTodos, _ := database.Todos.Find(bson.M{"title": "Hello"})
-
-	for _, todo := range allTodos {
-		fmt.Println(todo.ID)
-	}
 }
 ```
 
 ### ToDo
 - [x] CRUD
+- [x] Hooks
 - [ ] Pagination
 - [ ] Aggregations
-- [ ] Hooks
+
 
 
