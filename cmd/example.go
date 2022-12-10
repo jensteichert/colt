@@ -14,9 +14,10 @@ type Todo struct {
 	Title    string `bson:"title" json:"title"`
 }
 
-func(t *Todo) BeforeInsert() {
+func(t *Todo) BeforeInsert() error {
 	t.DocWithTimestamps.BeforeInsert()
 	fmt.Println("BeforeInsert executed")
+	return nil
 }
 
 func main() {

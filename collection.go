@@ -39,7 +39,7 @@ func (repo *Collection[T]) UpdateOne(filter interface{}, model T) error {
 		}
 	}
 
-	_, err := repo.collection.UpdateOne(DefaultContext(), filter, model)
+	_, err := repo.collection.UpdateOne(DefaultContext(), filter, bson.M{"$set": model})
 	return err
 }
 
