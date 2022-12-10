@@ -56,7 +56,7 @@ func main() {
 
 #### ``BeforeInsert`` Hook
 Triggers before a document will be inserted
-```
+```golang
 type Todo struct {
 	colt.DocWithTimestamps `bson:",inline"`
 }
@@ -71,7 +71,7 @@ func(t *Todo) BeforeInsert() error {
 
 #### ``BeforeUpdate`` Hook
 Triggers before a document will be updated
-```
+```golang
 func(t *Todo) BeforeUpdate() error {
 	t.DocWithTimestamps.BeforeUpdate()
 
@@ -86,6 +86,6 @@ func(t *Todo) BeforeUpdate() error {
 - [x] Hooks
 - [ ] Pagination
 - [ ] Aggregations
-
+- [ ] Transactions
 
 
