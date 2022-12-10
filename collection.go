@@ -33,7 +33,7 @@ func (repo *Collection[T]) UpdateById(id string, model T) error {
 }
 
 func (repo *Collection[T]) UpdateOne(filter interface{}, model T) error {
-	if hook, ok := any(model).(BeforeUpdate); ok {
+	if hook, ok := any(model).(BeforeUpdateHook); ok {
 		if err := hook.BeforeUpdate(); err != nil {
 			return err
 		}

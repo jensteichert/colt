@@ -4,6 +4,6 @@ type BeforeInsertHook interface {
 	BeforeInsert() error
 }
 
-type BeforeUpdate interface {
+type BeforeUpdateHook interface {
 	BeforeUpdate() error
 }

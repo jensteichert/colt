@@ -6,6 +6,7 @@ The mongodb ODM for Go i've always wanted
 [![Go.Dev reference](https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/github.com/jensteichert/colt)
 <a href="https://github.com/jensteichert/colt/releases"><img src="https://img.shields.io/github/v/release/jensteichert/colt" /></a>
 [![Go Report Card](https://goreportcard.com/badge/github.com/jensteichert/colt)](https://goreportcard.com/report/github.com/jensteichert/colt)
+[![Coverage Status](https://coveralls.io/repos/github/jensteichert/colt/badge.svg?branch=main)](https://coveralls.io/github/jensteichert/colt?branch=main)
 
 Colt leverages Generics to provide type-safe methods and decoding of documents. It therefor requires [Go 1.18+](https://tip.golang.org/doc/go1.18). 
 ### Installation
