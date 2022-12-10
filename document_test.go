@@ -1,30 +1,27 @@
 package colt
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
-type Todo struct {
-	CDocument `bson:",inline"`
+type todo struct {
+	Doc   `bson:",inline"`
 	Title string `bson:"title" json:"title"`
 }
+
 func TestCDocument_SetID(t *testing.T) {
-	doc := Todo{}
+	doc := todo{}
 	doc.SetID("638cda03871d719a9020c855")
 
-	if doc.ID != "638cda03871d719a9020c855" {
-		t.Errorf("ID is %s, should be 638cda03871d719a9020c855", doc.ID)
-	}
+	assert.Equal(t, doc.ID, "638cda03871d719a9020c855")
 }
 
 func TestCDocument_GetID(t *testing.T) {
-	doc := Todo{}
-
-	if doc.GetID() != "" {
-		t.Errorf("ID should be empty but is %s", doc.ID)
-	}
+	doc := todo{}
+	assert.Empty(t, doc.GetID())
 
 	doc.SetID("638cda03871d719a9020c855")
 
-	if doc.GetID() != "638cda03871d719a9020c855" {
-		t.Errorf("ID should be 638cda03871d719a9020c855 but is %s", doc.ID)
-	}
+	assert.Equal(t, doc.ID, "638cda03871d719a9020c855")
 }

@@ -9,7 +9,7 @@ The mongodb ODM for Go i've always wanted
 
 Colt leverages Generics to provide type-safe methods and decoding of documents. It therefor requires [Go 1.18+](https://tip.golang.org/doc/go1.18). 
 ### Installation
-
+To install Colt, use `go get`:
 ```
 go get github.com/jensteichert/colt
 ```
@@ -27,8 +27,9 @@ import (
 type Database struct {
 	Todos *colt.Collection[*Todo]
 }
+
 type Todo struct {
-	colt.CDocument `bson:",inline"`
+	colt.DocWithTimestamps `bson:",inline"`
 	Title string `bson:"title" json:"title"`
 }
 
@@ -46,17 +47,45 @@ func main() {
 	insertedTodo, _ := database.Todos.FindById(todo.ID)
 
 	allTodos, _ := database.Todos.Find(bson.M{"title": "Hello"})
-
-	for _, todo := range allTodos {
-		fmt.Println(todo.ID)
-	}
 }
 ```
 
+## Features
+
+### Hooks
+
+#### ``BeforeInsert`` Hook
+Triggers before a document will be inserted
+```
+type Todo struct {
+	colt.DocWithTimestamps `bson:",inline"`
+}
+
+func(t *Todo) BeforeInsert() error {
+	t.DocWithTimestamps.BeforeInsert()
+
+        // Do something with t here
+	return nil
+}
+```
+
+#### ``BeforeUpdate`` Hook
+Triggers before a document will be updated
+```
+func(t *Todo) BeforeUpdate() error {
+	t.DocWithTimestamps.BeforeUpdate()
+
+        // Do something with t here
+	return nil
+}
+```
+
+
 ### ToDo
 - [x] CRUD
+- [x] Hooks
 - [ ] Pagination
 - [ ] Aggregations
-- [ ] Hooks
+
 
 
