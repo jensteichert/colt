@@ -50,7 +50,6 @@ func (repo *Collection[T]) UpdateMany(filter interface{}, doc bson.M) error {
 
 func (repo *Collection[T]) FindById(id interface{}) (T, error) {
 	var target T
-	//safeID, err := T.CastID(id)
 	err := repo.collection.FindOne(DefaultContext(), bson.M{"_id": id}).Decode(target)
 
 	return target, err
@@ -70,15 +69,11 @@ func (repo *Collection[T]) DeleteById(id string) error {
 	return nil
 }
 
-func (repo *Collection[T]) FindOne(filter interface{}) (*T, error) {
+func (repo *Collection[T]) FindOne(filter interface{}) (T, error) {
 	var target T
 	err := repo.collection.FindOne(DefaultContext(), filter).Decode(&target)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return &target, nil
+	return target, err
 }
 
 func (repo *Collection[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T, error) {
