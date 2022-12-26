@@ -1,6 +1,7 @@
 package colt
 
 import (
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -12,6 +13,7 @@ func (repo *Collection[T]) CreateIndex(keys bson.M) {
 		}
 		_, err := repo.collection.Indexes().CreateOne(DefaultContext(), mod)
 		if err != nil {
+			fmt.Println(err)
 		}
 	}()
 }
