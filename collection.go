@@ -77,7 +77,7 @@ func (repo *Collection[T]) FindOne(filter interface{}) (T, error) {
 func (repo *Collection[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T, error) {
 	csr, err := repo.collection.Find(DefaultContext(), filter, opts...)
 
-	var result []T
+	var result = []T{}
 	if err = csr.All(DefaultContext(), &result); err != nil {
 		return nil, err
 	}
