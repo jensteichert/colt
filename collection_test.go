@@ -30,6 +30,8 @@ func TestCollection_FindById(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, doc.ID, result.ID)
+
+	mockDb.Disconnect()
 }
 
 func TestCollection_FindOne(t *testing.T) {
@@ -48,6 +50,8 @@ func TestCollection_FindOne(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, doc.ID, result.ID)
+
+	mockDb.Disconnect()
 }
 
 func TestCollection_Find(t *testing.T) {
@@ -69,6 +73,8 @@ func TestCollection_Find(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.Equal(t, len(result), 1)
 	assert.Equal(t, doc.ID, result[0].ID)
+
+	mockDb.Disconnect()
 }
 
 func TestCollection_Find_Empty(t *testing.T) {
@@ -90,7 +96,11 @@ func TestCollection_Find_Empty(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.Equal(t, len(result), 0)
 	assert.Equal(t, result, []*testdoc{})
+
+	mockDb.Disconnect()
 }
+
+
 
 // TODO
 func TestCollection_UpdateOne(t *testing.T) {
@@ -130,4 +140,6 @@ func TestCollection_CountDocuments(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, resultEmpty)
 	assert.Equal(t, resultEmpty, int64(0))
+
+	mockDb.Disconnect()
 }
