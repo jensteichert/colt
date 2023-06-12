@@ -41,6 +41,12 @@ func (db *Database) Connect(connectionString string, dbName string) error {
 	return err
 }
 
+func (db *Database) Disconnect() error {
+	err := db.client.Disconnect(DefaultContext());
+	db.db = nil
+	return err
+}
+
 func DefaultContext() context.Context {
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	return ctx

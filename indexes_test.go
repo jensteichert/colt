@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 func TestCollection_CreateIndex(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	mockDb.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
@@ -30,5 +29,5 @@ func TestCollection_CreateIndex(t *testing.T) {
 	indexCursor2.All(DefaultContext(), &indxs)
 
 	// new index
-	assert.Equal(t, len(indxs), indexCountBefore + 1)
+	assert.Equal(t, len(indxs), indexCountBefore+1)
 }

@@ -85,7 +85,8 @@ func(t *Todo) BeforeUpdate() error {
 ### ToDo
 - [x] CRUD
 - [x] Hooks
-- [ ] Pagination
+- [x] Disconnect
+- [ ] Context
 - [ ] Aggregations
 - [ ] Transactions
 
