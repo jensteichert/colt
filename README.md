@@ -1,5 +1,5 @@
 # Colt
-The mongodb ODM for Go i've always wanted
+The [MongoDB](https://www.mongodb.com) ODM for [Go](https://go.dev) i've always wanted.
 
 ![Build & Tests](https://github.com/jensteichert/webvitals_exporter/workflows/Build/badge.svg)
 ![CodeQL](https://github.com/jensteichert/colt/workflows/CodeQL/badge.svg)
@@ -8,7 +8,11 @@ The mongodb ODM for Go i've always wanted
 [![Go Report Card](https://goreportcard.com/badge/github.com/jensteichert/colt)](https://goreportcard.com/report/github.com/jensteichert/colt)
 [![Coverage Status](https://coveralls.io/repos/github/jensteichert/colt/badge.svg?branch=main)](https://coveralls.io/github/jensteichert/colt?branch=main)
 
-Colt leverages Generics to provide type-safe methods and decoding of documents. It therefor requires [Go 1.18+](https://tip.golang.org/doc/go1.18). 
+Colt is a wrapper around the official [mongo-go-driver](https://github.com/mongodb/mongo-go-driver).
+
+### Requirements
+- [Go 1.18](https://tip.golang.org/doc/go1.18) or higher. Colt leverages Generics to provide type-safe methods and decoding of documents.
+
 ### Installation
 To install Colt, use `go get`:
 ```
@@ -81,13 +85,22 @@ func(t *Todo) BeforeUpdate() error {
 }
 ```
 
+#### ``NewID`` Hook
+Can be used to generate custom ids for documents within a collection
+```golang
+func(t *Todo) BeforeUpdate() error {
+	t.DocWithTimestamps.BeforeUpdate()
+
+        // Do something with t here
+	return nil
+}
+```
 
 ### ToDo
 - [x] CRUD
 - [x] Hooks
 - [x] Disconnect
 - [ ] Context
-- [ ] Aggregations
 - [ ] Transactions
 
 
