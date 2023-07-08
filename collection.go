@@ -14,7 +14,7 @@ type Collection[T Document] struct {
 
 func (repo *Collection[T]) Insert(model T) (T, error) {
 	if model.GetID() == "" {
-		model.SetID(repo.NewId().Hex())
+		model.SetID(model.NewID())
 	}
 
 	if hook, ok := any(model).(BeforeInsertHook); ok {

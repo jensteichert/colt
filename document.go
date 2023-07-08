@@ -1,15 +1,24 @@
 package colt
 
-import "time"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+)
 
 type Document interface {
 	SetID(id string)
 	GetID() string
+
+	NewID() string
 	//CastID(id interface{}) (interface{}, error)
 }
 
 type Doc struct {
 	ID    string `bson:"_id,omitempty" json:"_id,omitempty"`
+}
+
+func (doc *Doc) NewID() string {
+	return primitive.NewObjectID().Hex()
 }
 
 func (doc *Doc) SetID(id string) {
