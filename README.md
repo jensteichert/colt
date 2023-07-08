@@ -88,11 +88,8 @@ func(t *Todo) BeforeUpdate() error {
 #### ``NewID`` Hook
 Can be used to generate custom ids for documents within a collection
 ```golang
-func(t *Todo) BeforeUpdate() error {
-	t.DocWithTimestamps.BeforeUpdate()
-
-        // Do something with t here
-	return nil
+func (t *Todo) NewID() string {
+    return "td_" + primitive.NewObjectID().Hex()
 }
 ```
 
