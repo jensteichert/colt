@@ -42,7 +42,7 @@ func (db *Database) Connect(connectionString string, dbName string) error {
 }
 
 func (db *Database) Disconnect() error {
-	err := db.client.Disconnect(DefaultContext());
+	err := db.client.Disconnect(DefaultContext())
 	db.db = nil
 	return err
 }
@@ -54,4 +54,8 @@ func DefaultContext() context.Context {
 
 func GetCollection[T Document](db *Database, collectionName string) *Collection[T] {
 	return &Collection[T]{db.db.Collection(collectionName)}
+}
+
+func GetPipeline[T Document, R any](collection *Collection[T]) *Pipeline[T, R] {
+	return &Pipeline[T, R]{collection.collection, make(mongo.Pipeline, 0)}
 }
