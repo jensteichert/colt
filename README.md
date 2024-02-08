@@ -1,12 +1,13 @@
 # Colt
-The [MongoDB](https://www.mongodb.com) ODM for [Go](https://go.dev) i've always wanted.
+The [MongoDB](https://www.mongodb.com) ODM for [Go](https://go.dev) i've always wanted. Inspired by [Mongoose](https://github.com/Automattic/mongoose)
 
 ![Build & Tests](https://github.com/jensteichert/webvitals_exporter/workflows/Build/badge.svg)
-![CodeQL](https://github.com/jensteichert/colt/workflows/CodeQL/badge.svg)
-[![Go.Dev reference](https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/github.com/jensteichert/colt)
-<a href="https://github.com/jensteichert/colt/releases"><img src="https://img.shields.io/github/v/release/jensteichert/colt" /></a>
-[![Go Report Card](https://goreportcard.com/badge/github.com/jensteichert/colt)](https://goreportcard.com/report/github.com/jensteichert/colt)
 [![Coverage Status](https://coveralls.io/repos/github/jensteichert/colt/badge.svg?branch=main)](https://coveralls.io/github/jensteichert/colt?branch=main)
+[![Go.Dev reference](https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/github.com/jensteichert/colt)
+![CodeQL](https://github.com/jensteichert/colt/workflows/CodeQL/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jensteichert/colt)](https://goreportcard.com/report/github.com/jensteichert/colt)
+<a href="https://github.com/jensteichert/colt/releases"><img src="https://img.shields.io/github/v/release/jensteichert/colt" /></a>
+
 
 Colt is a wrapper around the official [mongo-go-driver](https://github.com/mongodb/mongo-go-driver).
 
