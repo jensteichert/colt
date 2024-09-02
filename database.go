@@ -13,6 +13,26 @@ import (
 type Database struct {
 	db     *mongo.Database
 	client *mongo.Client
+
+	opts opts
+}
+
+func (db *Database) applyOptions(options ...Option) error {
+	for _, o := range options {
+		err := o(&db.opts)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func New(options ...Option) (*Database, error) {
+	db := new(Database)
+	if err := db.applyOptions(options...); err != nil {
+		return nil, err
+	}
+	return db, nil
 }
 
 func (db *Database) connect(options *options.ClientOptions, dbName string) error {
@@ -26,9 +46,9 @@ func (db *Database) connect(options *options.ClientOptions, dbName string) error
 	db.client = client
 	err = db.client.Ping(context.Background(), readpref.Primary())
 	if err == nil {
-		log.Print("Connected to MongoDB!")
+		db.opts.Logger().Print("Connected to MongoDB!")
 	} else {
-		log.Panic("Could not connect to MongoDB! Please check if mongo is running.", err)
+		db.opts.Logger().Panic("Could not connect to MongoDB! Please check if mongo is running.", err)
 		return err
 	}
 	db.db = db.client.Database(dbName)
@@ -36,13 +56,17 @@ func (db *Database) connect(options *options.ClientOptions, dbName string) error
 }
 
 func (db *Database) Connect(connectionString string, dbName string) error {
-	options := options.Client().ApplyURI(connectionString)
-	err := db.connect(options, dbName)
+	if err := db.applyOptions(WithConnectionString(connectionString), WithDBName(dbName)); err != nil {
+		return err
+	}
+
+	dbOptions := options.Client().ApplyURI(db.opts.ConnectionString())
+	err := db.connect(dbOptions, db.opts.DBName())
 	return err
 }
 
 func (db *Database) Disconnect() error {
-	err := db.client.Disconnect(DefaultContext());
+	err := db.client.Disconnect(DefaultContext())
 	db.db = nil
 	return err
 }
