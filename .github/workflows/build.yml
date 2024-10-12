@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mongodb-version: [ 6.0, 7.0, 8.0 ]
     steps:
       - uses: actions/checkout@v2
       - name: Setup Go
@@ -25,7 +28,7 @@ jobs:
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.8.0
         with:
-          mongodb-version: 6.0
+          mongodb-version: ${{ matrix.mongodb-version }}
 
       - name: Run tests
         run: go test -v -covermode=count -coverprofile=coverage.out
@@ -38,9 +41,3 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.lcov
-
-#      - name: Upload Go test results
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: Go-results-${{ matrix.go-version }}
-#          path: TestResults-${{ matrix.go-version }}.json
