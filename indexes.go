@@ -5,9 +5,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func (repo *CollectionImpl[T]) CreateIndex(keys bson.D) error {
+func (repo *Collection[T]) CreateIndex(keys bson.D)  error {
 	mod := mongo.IndexModel{
-		Keys:    keys,
+		Keys: keys,
 		Options: nil,
 	}
 	_, err := repo.collection.Indexes().CreateOne(DefaultContext(), mod)

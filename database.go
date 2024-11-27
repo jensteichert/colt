@@ -52,6 +52,6 @@ func DefaultContext() context.Context {
 	return ctx
 }
 
-func GetCollection[T Document](db *Database, collectionName string) Collection[T] {
-	return &CollectionImpl[T]{db.db.Collection(collectionName)}
+func GetCollection[T Document](db *Database, collectionName string) *Collection[T] {
+	return &Collection[T]{db.db.Collection(collectionName)}
 }

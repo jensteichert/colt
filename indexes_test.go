@@ -2,19 +2,18 @@ package colt
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"go.mongodb.org/mongo-driver/bson"
 	"math/rand"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func TestCollection_CreateIndex(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	mockDb.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
 
-	collection := &CollectionImpl[*testdoc]{collection: mockDb.db.Collection("testdocs")}
+	collection := GetCollection[*testdoc](&mockDb, "testdocs")
 
 	var indxs = []interface{}{}
 	indexCursor, _ := collection.collection.Indexes().List(DefaultContext())
@@ -39,7 +38,7 @@ func TestCollection_CreateMultiKeyIndex(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	mockDb.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
 
-	collection := &CollectionImpl[*testdoc]{collection: mockDb.db.Collection("testdocs")}
+	collection := GetCollection[*testdoc](&mockDb, "testdocs")
 
 	var indxs = []interface{}{}
 	indexCursor, _ := collection.collection.Indexes().List(DefaultContext())

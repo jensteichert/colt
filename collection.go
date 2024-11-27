@@ -9,27 +9,11 @@ import (
 )
 
 
-type Collection[T Document] interface {
-	CountDocuments(filter interface{}) (int64, error)
-	CreateIndex(keys primitive.D) error
-	DeleteById(id string) error
-	Find(filter interface{}, opts ...*options.FindOptions) ([]T, error)
-	FindById(id interface{}) (T, error)
-	FindOne(filter interface{}) (T, error)
-	Insert(model T) (T, error)
-	NewId() primitive.ObjectID
-	UpdateById(id string, model T) error
-	UpdateMany(filter interface{}, doc primitive.M) error
-	UpdateOne(filter interface{}, model T) error
-	Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]bson.M, error)
-	Drop() error
-}
-
-type CollectionImpl[T Document] struct {
+type Collection[T Document] struct {
 	collection *mongo.Collection
 }
 
-func (repo *CollectionImpl[T]) Insert(model T) (T, error) {
+func (repo *Collection[T]) Insert(model T) (T, error) {
 	if model.GetID() == "" {
 		model.SetID(model.NewID())
 	}
@@ -48,11 +32,11 @@ func (repo *CollectionImpl[T]) Insert(model T) (T, error) {
 	return model, err
 }
 
-func (repo *CollectionImpl[T]) UpdateById(id string, model T) error {
+func (repo *Collection[T]) UpdateById(id string, model T) error {
 	return repo.UpdateOne(bson.M{"_id": id}, model)
 }
 
-func (repo *CollectionImpl[T]) UpdateOne(filter interface{}, model T) error {
+func (repo *Collection[T]) UpdateOne(filter interface{}, model T) error {
 	if hook, ok := any(model).(BeforeUpdateHook); ok {
 		if err := hook.BeforeUpdate(); err != nil {
 			return err
@@ -63,13 +47,13 @@ func (repo *CollectionImpl[T]) UpdateOne(filter interface{}, model T) error {
 	return err
 }
 
-func (repo *CollectionImpl[T]) UpdateMany(filter interface{}, doc bson.M) error {
+func (repo *Collection[T]) UpdateMany(filter interface{}, doc bson.M) error {
 	_, err := repo.collection.UpdateMany(DefaultContext(), filter, doc)
 	return err
 }
 
 
-func (repo *CollectionImpl[T]) DeleteById(id string) error {
+func (repo *Collection[T]) DeleteById(id string) error {
 	res, err := repo.collection.DeleteOne(DefaultContext(), bson.M{"_id": id})
 
 	if err != nil {
@@ -83,18 +67,18 @@ func (repo *CollectionImpl[T]) DeleteById(id string) error {
 	return nil
 }
 
-func (repo *CollectionImpl[T]) FindById(id interface{}) (T, error) {
+func (repo *Collection[T]) FindById(id interface{}) (T, error) {
 	return repo.FindOne(bson.M{"_id": id})
 }
 
-func (repo *CollectionImpl[T]) FindOne(filter interface{}) (T, error) {
+func (repo *Collection[T]) FindOne(filter interface{}) (T, error) {
 	var target T
 	err := repo.collection.FindOne(DefaultContext(), filter).Decode(&target)
 
 	return target, err
 }
 
-func (repo *CollectionImpl[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T, error) {
+func (repo *Collection[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T, error) {
 	csr, err := repo.collection.Find(DefaultContext(), filter, opts...)
 	if err != nil {
 		return nil, err
@@ -107,12 +91,12 @@ func (repo *CollectionImpl[T]) Find(filter interface{}, opts ...*options.FindOpt
 	return result, nil
 }
 
-func (repo *CollectionImpl[T]) CountDocuments(filter interface{}) (int64, error) {
+func (repo *Collection[T]) CountDocuments(filter interface{}) (int64, error) {
 	count, err := repo.collection.CountDocuments(DefaultContext(), filter)
 	return count, err
 }
 
-func (repo *CollectionImpl[T]) Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]bson.M, error) {
+func (repo *Collection[T]) Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]bson.M, error) {
 	csr, err := repo.collection.Aggregate(DefaultContext(), pipeline, opts...)
 
 	var result = []bson.M{}
@@ -123,13 +107,13 @@ func (repo *CollectionImpl[T]) Aggregate(pipeline mongo.Pipeline, opts ...*optio
 	return result, nil
 }
 
-func (repo *CollectionImpl[T]) Drop() error {
+func (repo *Collection[T]) Drop() error {
 	err := repo.collection.Drop(DefaultContext())
 	return err
 }
 
 
-func (repo *CollectionImpl[T]) NewId() primitive.ObjectID {
+func (repo *Collection[T]) NewId() primitive.ObjectID {
 	return primitive.NewObjectID()
 }
 
