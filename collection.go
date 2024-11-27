@@ -24,7 +24,10 @@ func (repo *Collection[T]) Insert(model T) (T, error) {
 	}
 
 	res, err := repo.collection.InsertOne(DefaultContext(), model)
-	model.SetID(res.InsertedID.(string))
+	if err != nil && res != nil {
+		model.SetID(res.InsertedID.(string))
+	}
+
 	return model, err
 }
 
@@ -76,7 +79,9 @@ func (repo *Collection[T]) FindOne(filter interface{}) (T, error) {
 
 func (repo *Collection[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T, error) {
 	csr, err := repo.collection.Find(DefaultContext(), filter, opts...)
-
+	if err != nil {
+		return nil, err
+	}
 	var result = []T{}
 	if err = csr.All(DefaultContext(), &result); err != nil {
 		return nil, err

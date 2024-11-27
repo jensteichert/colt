@@ -9,10 +9,12 @@ import (
 type Database struct {
 	Todos *colt.Collection[*Todo]
 }
+
 type Todo struct {
 	colt.DocWithTimestamps `bson:",inline"`
 	Title    string `bson:"title" json:"title"`
 }
+
 
 func(t *Todo) BeforeInsert() error {
 	t.DocWithTimestamps.BeforeInsert()
