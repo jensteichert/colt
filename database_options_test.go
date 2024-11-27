@@ -1,6 +1,7 @@
 package colt
 
 import (
+	"log"
 	"reflect"
 	"testing"
 )
@@ -26,6 +27,15 @@ func TestWithLogger(t *testing.T) {
 }
 
 func Test_databaseOptions_Logger(t *testing.T) {
+	t.Run("should return the default logger", func(t *testing.T) {
+		want := log.Default()
+		db := &Database{options: databaseOptions{}}
+
+		if got := db.options.Logger(); !reflect.DeepEqual(want, got) {
+			t.Errorf("WithLogger() = %v, want %v", got, want)
+		}
+	})
+
 	t.Run("should return the provided logger from the database", func(t *testing.T) {
 		want := &testLogger{}
 		db := &Database{options: databaseOptions{
