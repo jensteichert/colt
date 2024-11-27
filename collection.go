@@ -21,6 +21,8 @@ type Collection[T Document] interface {
 	UpdateById(id string, model T) error
 	UpdateMany(filter interface{}, doc primitive.M) error
 	UpdateOne(filter interface{}, model T) error
+	Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]bson.M, error)
+	Drop() error
 }
 
 type CollectionImpl[T Document] struct {
@@ -110,6 +112,24 @@ func (repo *CollectionImpl[T]) CountDocuments(filter interface{}) (int64, error)
 	return count, err
 }
 
+func (repo *CollectionImpl[T]) Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]bson.M, error) {
+	csr, err := repo.collection.Aggregate(DefaultContext(), pipeline, opts...)
+
+	var result = []bson.M{}
+	if err = csr.All(DefaultContext(), &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (repo *CollectionImpl[T]) Drop() error {
+	err := repo.collection.Drop(DefaultContext())
+	return err
+}
+
+
 func (repo *CollectionImpl[T]) NewId() primitive.ObjectID {
 	return primitive.NewObjectID()
 }
+
