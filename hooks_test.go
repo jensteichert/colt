@@ -7,24 +7,25 @@ import (
 )
 
 type testDoc struct {
-	mock.Mock `bson:"-"`
+	mock.Mock         `bson:"-"`
 	DocWithTimestamps `bson:",inline"`
-	Title    string `bson:"title" json:"title"`
+	Title             string `bson:"title" json:"title"`
 }
 
-func(t *testDoc) BeforeInsert() error {
+func (t *testDoc) BeforeInsert() error {
 	t.DocWithTimestamps.BeforeInsert()
 	args := t.Called()
 	return args.Error(0)
 }
 
-func(t *testDoc) BeforeUpdate() error {
+func (t *testDoc) BeforeUpdate() error {
 	t.DocWithTimestamps.BeforeUpdate()
 	args := t.Called()
 	return args.Error(0)
 }
 
 var mockDb = Database{}
+
 func TestBeforeInsertHook(t *testing.T) {
 	mockDb.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
 	doc := testDoc{Title: "Test"}

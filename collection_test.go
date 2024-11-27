@@ -17,7 +17,6 @@ type testdoc struct {
 	Title string `bson:"title" json:"title"`
 }
 
-
 type testdocWithCustomID struct {
 	Doc   `bson:",inline"`
 	Title string `bson:"title" json:"title"`
@@ -26,7 +25,6 @@ type testdocWithCustomID struct {
 func (pg *testdocWithCustomID) NewID() string {
 	return "test_" + primitive.NewObjectID().Hex()
 }
-
 
 func TestCollection_Insert(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
@@ -252,7 +250,6 @@ func TestCollection_DeleteById(t *testing.T) {
 	mockDb.Disconnect()
 }
 
-
 func TestCollection_CountDocuments(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	mockDb.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
@@ -280,8 +277,6 @@ func TestCollection_CountDocuments(t *testing.T) {
 
 	mockDb.Disconnect()
 }
-
-
 
 func TestCollection_Aggregate(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())

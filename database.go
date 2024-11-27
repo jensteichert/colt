@@ -42,7 +42,7 @@ func (db *Database) Connect(connectionString string, dbName string) error {
 }
 
 func (db *Database) Disconnect() error {
-	err := db.client.Disconnect(DefaultContext());
+	err := db.client.Disconnect(DefaultContext())
 	db.db = nil
 	return err
 }

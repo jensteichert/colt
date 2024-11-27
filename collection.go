@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-
 type Collection[T Document] struct {
 	collection *mongo.Collection
 }
@@ -51,7 +50,6 @@ func (repo *Collection[T]) UpdateMany(filter interface{}, doc bson.M) error {
 	_, err := repo.collection.UpdateMany(DefaultContext(), filter, doc)
 	return err
 }
-
 
 func (repo *Collection[T]) DeleteById(id string) error {
 	res, err := repo.collection.DeleteOne(DefaultContext(), bson.M{"_id": id})
@@ -112,8 +110,6 @@ func (repo *Collection[T]) Drop() error {
 	return err
 }
 
-
 func (repo *Collection[T]) NewId() primitive.ObjectID {
 	return primitive.NewObjectID()
 }
-

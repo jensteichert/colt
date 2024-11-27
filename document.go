@@ -14,7 +14,7 @@ type Document interface {
 }
 
 type Doc struct {
-	ID    string `bson:"_id,omitempty" json:"_id,omitempty"`
+	ID string `bson:"_id,omitempty" json:"_id,omitempty"`
 }
 
 func (doc *Doc) NewID() string {
@@ -30,8 +30,8 @@ func (doc *Doc) GetID() string {
 }
 
 type DocWithTimestamps struct {
-	Doc `bson:",inline"`
-	CreatedAt time.Time `json:"created_at" bson:"created_at"`
+	Doc       `bson:",inline"`
+	CreatedAt time.Time  `json:"created_at" bson:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 }
 
@@ -41,7 +41,7 @@ func (doc *DocWithTimestamps) BeforeInsert() error {
 }
 
 func (doc *DocWithTimestamps) BeforeUpdate() error {
-	now := time.Now();
+	now := time.Now()
 	doc.UpdatedAt = &now
 	return nil
 }
