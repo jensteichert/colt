@@ -9,8 +9,6 @@ type Logger interface {
 	Panic(v ...interface{})
 }
 
-type DatabaseOption func(db *databaseOptions) error
-
 // WithLogger sets the logger for the database. If none is provided, the default logger is used
 func WithLogger(logger Logger) DatabaseOption {
 	return func(db *databaseOptions) error {
@@ -18,6 +16,8 @@ func WithLogger(logger Logger) DatabaseOption {
 		return nil
 	}
 }
+
+type DatabaseOption func(db *databaseOptions) error
 
 type databaseOptions struct {
 	logger Logger
