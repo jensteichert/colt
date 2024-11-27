@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"math/rand"
 	"strings"
 	"testing"
@@ -231,8 +232,27 @@ func TestCollection_UpdateMany(t *testing.T) {
 
 // TODO
 func TestCollection_DeleteById(t *testing.T) {
+	rand.Seed(time.Now().UnixNano())
+	mockDb.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
 
+	collection := GetCollection[*testdoc](&mockDb, "testdocs")
+
+	title := fmt.Sprint(rand.Int())
+	doc := testdoc{Title: title}
+
+	collection.Insert(&doc)
+	err := collection.DeleteById(doc.ID)
+	assert.Nil(t, err)
+
+	result, err := collection.FindById(doc.ID)
+	assert.Nil(t, result)
+	assert.NotNil(t, err)
+
+	collection.Drop()
+	mockDb.Disconnect()
 }
+
+
 func TestCollection_CountDocuments(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	mockDb.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
@@ -258,5 +278,36 @@ func TestCollection_CountDocuments(t *testing.T) {
 	assert.NotNil(t, resultEmpty)
 	assert.Equal(t, resultEmpty, int64(0))
 
+	mockDb.Disconnect()
+}
+
+
+
+func TestCollection_Aggregate(t *testing.T) {
+	rand.Seed(time.Now().UnixNano())
+	mockDb.Connect("mongodb://localhost:27017/colt?readPreference=primary&directConnection=true&ssl=false", "colt")
+
+	collection := GetCollection[*testdoc](&mockDb, "aggregatetest")
+
+	title := fmt.Sprint(rand.Int())
+	doc := testdoc{Title: title}
+	doc2 := testdoc{Title: title}
+
+	collection.Insert(&doc)
+	collection.Insert(&doc2)
+
+	result, err := collection.Aggregate(mongo.Pipeline{
+		bson.D{
+			{"$group", bson.D{
+				{"_id", "$title"},
+				{"count", bson.D{{"$sum", 1}}},
+			}}}})
+
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, result[0]["_id"], title)
+	assert.Equal(t, result[0]["count"], int32(2))
+
+	collection.Drop()
 	mockDb.Disconnect()
 }

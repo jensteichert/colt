@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+
 type Collection[T Document] struct {
 	collection *mongo.Collection
 }
@@ -95,6 +96,24 @@ func (repo *Collection[T]) CountDocuments(filter interface{}) (int64, error) {
 	return count, err
 }
 
+func (repo *Collection[T]) Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]bson.M, error) {
+	csr, err := repo.collection.Aggregate(DefaultContext(), pipeline, opts...)
+
+	var result = []bson.M{}
+	if err = csr.All(DefaultContext(), &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (repo *Collection[T]) Drop() error {
+	err := repo.collection.Drop(DefaultContext())
+	return err
+}
+
+
 func (repo *Collection[T]) NewId() primitive.ObjectID {
 	return primitive.NewObjectID()
 }
+

@@ -31,7 +31,7 @@ jobs:
           mongodb-version: ${{ matrix.mongodb-version }}
 
       - name: Run tests
-        run: go test -v -covermode=count -coverprofile=coverage.out
+        run: go test `go list ./... | grep -v ./cmd` -v -covermode=count -coverprofile=coverage.out
 
       - name: Convert coverage.out to coverage.lcov
         uses: jandelgado/gcov2lcov-action@v1
