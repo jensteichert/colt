@@ -31,7 +31,7 @@ import (
 )
 
 type Database struct {
-	Todos *colt.Collection[*Todo]
+	Todos colt.Collection[*Todo]
 }
 
 type Todo struct {
