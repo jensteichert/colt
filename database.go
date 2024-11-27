@@ -13,6 +13,25 @@ import (
 type Database struct {
 	db     *mongo.Database
 	client *mongo.Client
+
+	options databaseOptions
+}
+
+func (db *Database) applyOptions(options ...DatabaseOption) error {
+	for _, o := range options {
+		if err := o(&db.options); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func New(options ...DatabaseOption) (*Database, error) {
+	db := new(Database)
+	if err := db.applyOptions(options...); err != nil {
+		return nil, err
+	}
+	return db, nil
 }
 
 func (db *Database) connect(options *options.ClientOptions, dbName string) error {
@@ -26,9 +45,9 @@ func (db *Database) connect(options *options.ClientOptions, dbName string) error
 	db.client = client
 	err = db.client.Ping(context.Background(), readpref.Primary())
 	if err == nil {
-		log.Print("Connected to MongoDB!")
+		db.options.Logger().Print("Connected to MongoDB!")
 	} else {
-		log.Panic("Could not connect to MongoDB! Please check if mongo is running.", err)
+		db.options.Logger().Panic("Could not connect to MongoDB! Please check if mongo is running.", err)
 		return err
 	}
 	db.db = db.client.Database(dbName)
