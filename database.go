@@ -41,6 +41,10 @@ func (db *Database) Connect(connectionString string, dbName string) error {
 	return err
 }
 
+func (db *Database) Ping() error {
+	return db.client.Ping(DefaultContext(), nil)
+}
+
 func (db *Database) Disconnect() error {
 	err := db.client.Disconnect(DefaultContext())
 	db.db = nil
