@@ -19,7 +19,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.23.2'
+          go-version: '1.25.5'
           cache: true
 
       - name: Run build
@@ -31,7 +31,7 @@ jobs:
           mongodb-version: ${{ matrix.mongodb-version }}
 
       - name: Run tests
-        run: go test `go list ./... | grep -v ./cmd` -v -covermode=count -coverprofile=coverage.out
+        run: GOTOOLCHAIN=go1.25.5+auto go test `go list ./... | grep -v ./cmd` -v -covermode=count -coverprofile=coverage.out
 
       - name: Convert coverage.out to coverage.lcov
         uses: jandelgado/gcov2lcov-action@v1

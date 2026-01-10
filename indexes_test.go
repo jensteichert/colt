@@ -1,13 +1,17 @@
 package colt
 
 import (
+	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson"
 	"math/rand"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"go.mongodb.org/mongo-driver/bson"
 )
+
+var testCtx = context.WithValue(context.Background(), "test", "ctx")
 
 func TestCollection_CreateIndex(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
@@ -16,8 +20,8 @@ func TestCollection_CreateIndex(t *testing.T) {
 	collection := GetCollection[*testdoc](&mockDb, "testdocs")
 
 	var indxs = []interface{}{}
-	indexCursor, _ := collection.collection.Indexes().List(DefaultContext())
-	indexCursor.All(DefaultContext(), &indxs)
+	indexCursor, _ := collection.collection.Indexes().List(testCtx)
+	indexCursor.All(testCtx, &indxs)
 
 	indexCountBefore := len(indxs)
 
@@ -27,8 +31,8 @@ func TestCollection_CreateIndex(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	indexCursor2, _ := collection.collection.Indexes().List(DefaultContext())
-	indexCursor2.All(DefaultContext(), &indxs)
+	indexCursor2, _ := collection.collection.Indexes().List(testCtx)
+	indexCursor2.All(testCtx, &indxs)
 
 	// new index
 	assert.Equal(t, len(indxs), indexCountBefore+1)
@@ -41,8 +45,8 @@ func TestCollection_CreateMultiKeyIndex(t *testing.T) {
 	collection := GetCollection[*testdoc](&mockDb, "testdocs")
 
 	var indxs = []interface{}{}
-	indexCursor, _ := collection.collection.Indexes().List(DefaultContext())
-	indexCursor.All(DefaultContext(), &indxs)
+	indexCursor, _ := collection.collection.Indexes().List(testCtx)
+	indexCursor.All(testCtx, &indxs)
 
 	indexCountBefore := len(indxs)
 
@@ -53,8 +57,8 @@ func TestCollection_CreateMultiKeyIndex(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	indexCursor2, _ := collection.collection.Indexes().List(DefaultContext())
-	indexCursor2.All(DefaultContext(), &indxs)
+	indexCursor2, _ := collection.collection.Indexes().List(testCtx)
+	indexCursor2.All(testCtx, &indxs)
 
 	// new index
 	assert.Equal(t, len(indxs), indexCountBefore+1)

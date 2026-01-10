@@ -1,7 +1,9 @@
 package colt
 
 import (
+	"context"
 	"errors"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,6 +12,23 @@ import (
 
 type Collection[T Document] struct {
 	collection *mongo.Collection
+	ctx        context.Context // optional context
+}
+
+func (repo Collection[T]) WithContext(ctx context.Context) *Collection[T] {
+	repo.ctx = ctx
+	return &repo
+}
+
+func (repo *Collection[T]) ctxOrDefault() (context.Context, context.CancelFunc) {
+	if ctx := repo.ctx; ctx == nil {
+		return defaultContext()
+	}
+	if _, hasDeadline := repo.ctx.Deadline(); !hasDeadline {
+		ctxWithTimeout, cf := context.WithTimeout(repo.ctx, defaultTimeout)
+		return ctxWithTimeout, cf
+	}
+	return repo.ctx, nil
 }
 
 func (repo *Collection[T]) Insert(model T) (T, error) {
@@ -23,7 +42,11 @@ func (repo *Collection[T]) Insert(model T) (T, error) {
 		}
 	}
 
-	res, err := repo.collection.InsertOne(DefaultContext(), model)
+	ctx, cancel := repo.ctxOrDefault()
+	if cancel != nil {
+		defer cancel()
+	}
+	res, err := repo.collection.InsertOne(ctx, model)
 	if err != nil && res != nil {
 		model.SetID(res.InsertedID.(string))
 	}
@@ -42,17 +65,29 @@ func (repo *Collection[T]) UpdateOne(filter interface{}, model T) error {
 		}
 	}
 
-	_, err := repo.collection.UpdateOne(DefaultContext(), filter, bson.M{"$set": model})
+	ctx, cancel := repo.ctxOrDefault()
+	if cancel != nil {
+		defer cancel()
+	}
+	_, err := repo.collection.UpdateOne(ctx, filter, bson.M{"$set": model})
 	return err
 }
 
 func (repo *Collection[T]) UpdateMany(filter interface{}, doc bson.M) error {
-	_, err := repo.collection.UpdateMany(DefaultContext(), filter, doc)
+	ctx, cancel := repo.ctxOrDefault()
+	if cancel != nil {
+		defer cancel()
+	}
+	_, err := repo.collection.UpdateMany(ctx, filter, doc)
 	return err
 }
 
 func (repo *Collection[T]) DeleteById(id string) error {
-	res, err := repo.collection.DeleteOne(DefaultContext(), bson.M{"_id": id})
+	ctx, cancel := repo.ctxOrDefault()
+	if cancel != nil {
+		defer cancel()
+	}
+	res, err := repo.collection.DeleteOne(ctx, bson.M{"_id": id})
 
 	if err != nil {
 		return err
@@ -70,19 +105,27 @@ func (repo *Collection[T]) FindById(id interface{}) (T, error) {
 }
 
 func (repo *Collection[T]) FindOne(filter interface{}) (T, error) {
+	ctx, cancel := repo.ctxOrDefault()
+	if cancel != nil {
+		defer cancel()
+	}
 	var target T
-	err := repo.collection.FindOne(DefaultContext(), filter).Decode(&target)
+	err := repo.collection.FindOne(ctx, filter).Decode(&target)
 
 	return target, err
 }
 
 func (repo *Collection[T]) Find(filter interface{}, opts ...*options.FindOptions) ([]T, error) {
-	csr, err := repo.collection.Find(DefaultContext(), filter, opts...)
+	ctx, cancel := repo.ctxOrDefault()
+	if cancel != nil {
+		defer cancel()
+	}
+	csr, err := repo.collection.Find(ctx, filter, opts...)
 	if err != nil {
 		return nil, err
 	}
 	var result = []T{}
-	if err = csr.All(DefaultContext(), &result); err != nil {
+	if err = csr.All(ctx, &result); err != nil {
 		return nil, err
 	}
 
@@ -90,15 +133,23 @@ func (repo *Collection[T]) Find(filter interface{}, opts ...*options.FindOptions
 }
 
 func (repo *Collection[T]) CountDocuments(filter interface{}) (int64, error) {
-	count, err := repo.collection.CountDocuments(DefaultContext(), filter)
+	ctx, cancel := repo.ctxOrDefault()
+	if cancel != nil {
+		defer cancel()
+	}
+	count, err := repo.collection.CountDocuments(ctx, filter)
 	return count, err
 }
 
 func (repo *Collection[T]) Aggregate(pipeline mongo.Pipeline, opts ...*options.AggregateOptions) ([]bson.M, error) {
-	csr, err := repo.collection.Aggregate(DefaultContext(), pipeline, opts...)
+	ctx, cancel := repo.ctxOrDefault()
+	if cancel != nil {
+		defer cancel()
+	}
+	csr, err := repo.collection.Aggregate(ctx, pipeline, opts...)
 
 	var result = []bson.M{}
-	if err = csr.All(DefaultContext(), &result); err != nil {
+	if err = csr.All(ctx, &result); err != nil {
 		return nil, err
 	}
 
@@ -106,7 +157,11 @@ func (repo *Collection[T]) Aggregate(pipeline mongo.Pipeline, opts ...*options.A
 }
 
 func (repo *Collection[T]) Drop() error {
-	err := repo.collection.Drop(DefaultContext())
+	ctx, cancel := repo.ctxOrDefault()
+	if cancel != nil {
+		defer cancel()
+	}
+	err := repo.collection.Drop(ctx)
 	return err
 }
 
