@@ -10,6 +10,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+//go:generate mockgen -source=./database.go -destination=./mocks/database.go -package=mock_colt DatabaseIface
+type DatabaseIface interface {
+	Client() *mongo.Client
+	Connect(connectionString string, dbName string) error
+	Ping() error
+	Disconnect() error
+}
+
 type Database struct {
 	db     *mongo.Database
 	client *mongo.Client
@@ -33,6 +41,10 @@ func (db *Database) connect(options *options.ClientOptions, dbName string) error
 	}
 	db.db = db.client.Database(dbName)
 	return nil
+}
+
+func (db *Database) Client() *mongo.Client {
+	return db.client
 }
 
 func (db *Database) Connect(connectionString string, dbName string) error {
